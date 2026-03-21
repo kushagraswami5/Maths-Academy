@@ -26,7 +26,16 @@ export default function RegisterPage() {
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
         * { box-sizing: border-box; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .reg-wrap { animation: fadeIn 0.5s ease forwards; }
+        .reg-wrap { animation: fadeIn 0.5s ease forwards; display: grid; grid-template-columns: 1fr; width: 100%; max-width: 900px; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.12); }
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .left-col { background: #0b0f1a; padding: 32px 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; }
+        .right-col { background: white; padding: 32px 24px; }
+        @media (min-width: 850px) {
+          .reg-wrap { grid-template-columns: 420px 1fr; border-radius: 20px; }
+          .left-col { padding: 46px; gap: 0; }
+          .right-col { padding: 42px; }
+          .grid-2 { grid-template-columns: 1fr 1fr; }
+        }
         .rinp {
           width: 100%; padding: 11px 13px;
           border: 1.5px solid #e4e7ef; border-radius: 9px;
@@ -45,10 +54,10 @@ export default function RegisterPage() {
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
-      <div className="reg-wrap" style={{ display: "grid", gridTemplateColumns: "420px 1fr", width: "100%", maxWidth: 900, borderRadius: 20, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.12)" }}>
+      <div className="reg-wrap">
 
         {/* LEFT */}
-        <div style={{ background: "#0b0f1a", padding: 46, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div className="left-col">
           <div>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 44, textDecoration: "none" }}>
               <div style={{ width: 36, height: 36, background: "#e8a020", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 17, color: "#0b0f1a" }}>M</div>
@@ -67,7 +76,7 @@ export default function RegisterPage() {
         </div>
 
         {/* RIGHT */}
-        <div style={{ background: "white", padding: 42 }}>
+        <div className="right-col">
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "#0b0f1a", marginBottom: 4, letterSpacing: "-0.02em" }}>Create account</h2>
           <p style={{ fontSize: 13, color: "#7a8aa0", marginBottom: 24 }}>
             Already have an account? <Link href="/login" style={{ color: "#0b0f1a", fontWeight: 700, textDecoration: "none" }}>Sign in</Link>
