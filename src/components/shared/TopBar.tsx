@@ -8,9 +8,10 @@ interface TopBarProps {
   title: string
   subtitle?: string
   onMenuClick?: () => void
+  actions?: React.ReactNode
 }
 
-export default function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
+export default function TopBar({ title, subtitle, onMenuClick, actions }: TopBarProps) {
   const [name, setName] = useState("")
   const [time, setTime] = useState("")
   const ref = useRef<HTMLDivElement>(null)
@@ -53,6 +54,7 @@ export default function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
         </div>
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+        {actions && <div style={{ display:"flex", alignItems:"center", gap:8 }}>{actions}</div>}
         <span style={{ fontSize:12, color:"#7a8aa0", fontFamily:"JetBrains Mono,monospace", display:"none" }} className="topbar-time">{time}</span>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <div style={{ width:32, height:32, borderRadius:"50%", background:"#0b0f1a", display:"flex", alignItems:"center", justifyContent:"center", color:"#e8a020", fontWeight:700, fontSize:12 }}>{initials}</div>
