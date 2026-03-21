@@ -93,7 +93,7 @@ export default function LoginPage() {
         </div>
 
         <div style={{ position: "relative" }}>
-          <div className="stats-grid" className="grid-2" style={{ marginBottom: 16 }}>
+          <div className="stats-grid grid-2" style={{ marginBottom: 16 }}>
             {[["📡","Live Classes","Interactive sessions"],["📝","Auto-Graded Tests","Instant results"],["📊","Analytics","Track progress"],["💰","Fee Management","Easy payments"]].map(([icon,t,s]) => (
               <div key={t} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 11, padding: "12px 14px" }}>
                 <div style={{ fontSize: 18, marginBottom: 5 }}>{icon}</div>
