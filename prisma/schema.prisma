@@ -1,11 +1,11 @@
 generator client {
- provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
- provider = "postgresql"
- url = env("DATABASE_URL")
- directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -17,43 +17,174 @@ model User {
   class         String
   password      String
   role          String   @default("student")
+  isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
+
+  enrollments   Enrollment[]
+  submissions   TestSubmission[]
+  attendances   Attendance[]
+  payments      Payment[]
+  notifications Notification[]
 }
 
 model Course {
- id          String   @id @default(cuid())
- title       String
- description String
- price       Int
- createdAt   DateTime @default(now())
- lectures    Lecture[]  
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  class       String
+  price       Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  lectures    Lecture[]
+  enrollments Enrollment[]
+  homeworks   Homework[]
+  tests       Test[]
+  liveClasses LiveClass[]
 }
 
 model Lecture {
- id        String   @id @default(cuid())
- title     String
- videoUrl  String
- courseId  String
- course    Course   @relation(fields: [courseId], references: [id])
+  id        String   @id @default(cuid())
+  title     String
+  videoUrl  String
+  duration  Int      @default(0)  // minutes
+  order     Int      @default(0)
+  courseId  String
+  createdAt DateTime @default(now())
+
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model LiveClass {
+  id          String   @id @default(cuid())
+  title       String
+  meetUrl     String
+  scheduledAt DateTime
+  duration    Int      @default(60) // minutes
+  courseId    String
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  course      Course   @relation(fields: [courseId], references: [id])
+  attendances Attendance[]
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
 }
 
 model Homework {
- id        String   @id @default(cuid())
- title     String
- pdfUrl    String
- courseId  String
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  pdfUrl      String
+  dueDate     DateTime
+  courseId    String
+  createdAt   DateTime @default(now())
+
+  course      Course   @relation(fields: [courseId], references: [id])
+  submissions HomeworkSubmission[]
+}
+
+model HomeworkSubmission {
+  id           String   @id @default(cuid())
+  userId       String
+  homeworkId   String
+  fileUrl      String   @default("")
+  submittedAt  DateTime @default(now())
+  grade        Int?
+  feedback     String   @default("")
+
+  homework     Homework @relation(fields: [homeworkId], references: [id])
+
+  @@unique([userId, homeworkId])
 }
 
 model Test {
- id        String   @id @default(cuid())
- title     String
- courseId  String
+  id          String   @id @default(cuid())
+  title       String
+  courseId    String
+  totalMarks  Int      @default(100)
+  duration    Int      @default(60) // minutes
+  scheduledAt DateTime
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  course      Course   @relation(fields: [courseId], references: [id])
+  questions   Question[]
+  submissions TestSubmission[]
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  testId        String
+  text          String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctOption String   // "A", "B", "C", or "D"
+  marks         Int      @default(4)
+
+  test          Test     @relation(fields: [testId], references: [id])
+}
+
+model TestSubmission {
+  id          String   @id @default(cuid())
+  userId      String
+  testId      String
+  answers     Json     // { questionId: "A" | "B" | "C" | "D" }
+  score       Int      @default(0)
+  submittedAt DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  test        Test     @relation(fields: [testId], references: [id])
+
+  @@unique([userId, testId])
+}
+
+model Attendance {
+  id          String    @id @default(cuid())
+  userId      String
+  liveClassId String
+  joinedAt    DateTime  @default(now())
+  status      String    @default("present") // present | absent
+
+  user        User      @relation(fields: [userId], references: [id])
+  liveClass   LiveClass @relation(fields: [liveClassId], references: [id])
+
+  @@unique([userId, liveClassId])
 }
 
 model Payment {
- id        String   @id @default(cuid())
- userId    String
- courseId  String
- amount    Int
- status    String
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  amount    Int
+  status    String   @default("pending") // pending | paid | failed
+  method    String   @default("cash")
+  month     String   @default("")        // e.g. "2026-03"
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String   @default("general") // general | test | homework | payment | live
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
 }
